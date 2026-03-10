@@ -1,15 +1,22 @@
 version: '3.8'
 
+# Define a custom network to isolate this project completely
+networks:
+  safesite_net:
+    driver: bridge
+
 services:
   backend:
     build:
       context: ../back
       dockerfile: ../docker/backend.Dockerfile
-    container_name: safety_system_backend
+    container_name: safesite_backend
+    networks:
+      - safesite_net
     ports:
       - "8080:8080"
     volumes:
-      - ../back/attendance.db:/app/attendance.db
+      - sqlite_data:/app
     restart: always
     environment:
       - PYTHONUNBUFFERED=1
@@ -21,10 +28,15 @@ services:
       args:
         # VITE_API_URL can be injected here during build if required for production
         - VITE_API_URL=http://localhost:8080
-    container_name: safety_system_frontend
+    container_name: safesite_frontend
+    networks:
+      - safesite_net
     ports:
       - "3000:80"
     depends_on:
       - backend
     restart: always
+
+volumes:
+  sqlite_data:
 
