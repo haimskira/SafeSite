@@ -68,7 +68,17 @@ const translations = {
         current_password: "Current Password",
         new_password: "New Password",
         reset_password: "Reset Password",
-        must_change_password: "You must change your password before continuing."
+        must_change_password: "You must change your password before continuing.",
+        analytics: "Analytics Dashboard",
+        analytics_summary: "Daily Summary",
+        total_distinct_visitors: "Total Distinct Visitors",
+        peak_hour: "Peak Hour",
+        peak_count: "Peak Count",
+        hourly_load: "Hourly Load Graph",
+        detailed_flow: "Detailed Flow Table",
+        time_slot: "Time Slot",
+        visitors: "Visitors",
+        loading: "Loading..."
     },
     he: {
         dashboard: "מסך הבית",
@@ -135,7 +145,17 @@ const translations = {
         current_password: "סיסמה נוכחית",
         new_password: "סיסמה חדשה",
         reset_password: "איפוס סיסמה",
-        must_change_password: "עליך להחליף את הסיסמה שלך כדי להמשיך להשתמש במערכת."
+        must_change_password: "עליך להחליף את הסיסמה שלך כדי להמשיך להשתמש במערכת.",
+        analytics: "לוח סטטיסטיקות",
+        analytics_summary: "סיכום יומי",
+        total_distinct_visitors: "סה״כ מבקרים (ייחודיים)",
+        peak_hour: "שעת עומס",
+        peak_count: "שיא מבקרים",
+        hourly_load: "גרף עומס שעתי",
+        detailed_flow: "טבלת זרימה מפורטת",
+        time_slot: "שעה",
+        visitors: "מבקרים",
+        loading: "טוען..."
     }
 };
 

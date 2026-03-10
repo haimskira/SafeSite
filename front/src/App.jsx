@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Profile from './pages/Profile';
+import AdminAnalytics from './pages/AdminAnalytics';
 
 function App() {
   return (
@@ -24,6 +25,11 @@ function App() {
         <Route path="/admin" element={
           <AdminRoute>
             <AdminDashboard />
+          </AdminRoute>
+        } />
+        <Route path="/admin/analytics" element={
+          <AdminRoute>
+            <AdminAnalytics />
           </AdminRoute>
         } />
       </Routes>

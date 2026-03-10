@@ -104,3 +104,80 @@ def get_active_workers(
     ).filter(models.AttendanceLog.status != models.StatusEnum.CHECKED_OUT)
     
     return query.all()
+
+@router.get("/analytics")
+def get_analytics(
+    filter_date: Optional[date] = None,
+    site: Optional[models.SiteEnum] = None,
+    db: Session = Depends(get_db),
+    current_admin: models.User = Depends(get_current_admin_user)
+):
+    """
+    Returns aggregated analytics for the given date (defaulting to today).
+    It calculates the number of distinct users visiting each hour, total visitors, and peak load hour.
+    """
+    target_date = filter_date if filter_date else date.today()
+    start_of_day = datetime.combine(target_date, datetime.min.time())
+    end_of_day = datetime.combine(target_date, datetime.max.time())
+    
+    # Base query for logs on this date
+    query = db.query(models.AttendanceLog).filter(
+        models.AttendanceLog.timestamp >= start_of_day,
+        models.AttendanceLog.timestamp <= end_of_day
+    )
+    
+    if site:
+        query = query.filter(models.AttendanceLog.site == site)
+        
+    logs = query.order_by(models.AttendanceLog.timestamp.asc()).all()
+    
+    # 1. Total distinct visitors
+    distinct_users = set(log.user_id for log in logs)
+    total_visitors = len(distinct_users)
+    
+    # 2. Hourly load (aggregate by hour of timestamp)
+    hourly_counts = {hour: set() for hour in range(24)}
+    
+    for log in logs:
+        # A check-in or status update in an hour means they were present.
+        # This is a simple approximation where any logged action during an hour counts as presence.
+        hour = log.timestamp.hour
+        hourly_counts[hour].add(log.user_id)
+        
+    # Format for Recharts: [{hour: '08:00', count: 15}, ...]
+    chart_data = []
+    peak_hour = "N/A"
+    max_count = 0
+    
+    for hour in range(24):
+        count = len(hourly_counts[hour])
+        chart_data.append({
+            "hour": f"{hour:02d}:00",
+            "count": count
+        })
+        if count > max_count:
+            max_count = count
+            peak_hour = f"{hour:02d}:00"
+            
+    # Also return the raw logs for the detailed table list
+    # Re-use the response_model schema structure implicitly or use raw dicts
+    detailed_logs = []
+    for log in reversed(logs): # Latest first for the table
+        detailed_logs.append({
+            "id": log.id,
+            "user_name": f"{log.user.first_name} {log.user.last_name}",
+            "action_type": log.action_type,
+            "site": log.site.value if log.site else None,
+            "status": log.status.value if log.status else None,
+            "timestamp": log.timestamp.isoformat()
+        })
+            
+    return {
+        "summary": {
+            "total_visitors": total_visitors,
+            "peak_hour": peak_hour,
+            "peak_count": max_count
+        },
+        "chart_data": chart_data,
+        "detailed_logs": detailed_logs
+    }

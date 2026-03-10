@@ -45,7 +45,10 @@ const Navbar = () => {
                     <>
                         <Link to="/" className="nav-link">{t('dashboard')}</Link>
                         {user.role === 'ADMIN' && (
-                            <Link to="/admin" className="nav-link">{t('admin_panel')}</Link>
+                            <>
+                                <Link to="/admin" className="nav-link">{t('admin_panel')}</Link>
+                                <Link to="/admin/analytics" className="nav-link">{t('analytics')}</Link>
+                            </>
                         )}
                         <Link to="/profile" className="nav-link">{t('profile')}</Link>
                         <span style={{ color: 'var(--text-muted)' }} className="user-greeting">{t('hello')}, {user.first_name}</span>
