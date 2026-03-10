@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ../back
+      dockerfile: ../docker/backend.Dockerfile
+    container_name: safety_system_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../back/attendance.db:/app/attendance.db
+    restart: always
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  frontend:
+    build:
+      context: ../front
+      dockerfile: ../docker/frontend.Dockerfile
+      args:
+        # VITE_API_URL can be injected here during build if required for production
+        - VITE_API_URL=http://localhost:8000
+    container_name: safety_system_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
