@@ -7,7 +7,7 @@ services:
       dockerfile: ../docker/backend.Dockerfile
     container_name: safety_system_backend
     ports:
-      - "8000:8000"
+      - "8080:8080"
     volumes:
       - ../back/attendance.db:/app/attendance.db
     restart: always
@@ -20,10 +20,10 @@ services:
       dockerfile: ../docker/frontend.Dockerfile
       args:
         # VITE_API_URL can be injected here during build if required for production
-        - VITE_API_URL=http://localhost:8000
+        - VITE_API_URL=http://localhost:8080
     container_name: safety_system_frontend
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - backend
     restart: always

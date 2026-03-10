@@ -40,7 +40,7 @@ const AdminDashboard = () => {
 
     useEffect(() => {
         // Determine the base API URL (could be from env or default)
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
         
         // Convert http/https to ws/wss
         const wsUrl = baseUrl.replace(/^http(s?):\/\//, 'ws$1://') + '/ws';
