@@ -20,6 +20,9 @@ FROM nginx:alpine
 # Copy the built application from previous stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Copy custom Nginx configuration
+COPY default.conf /etc/nginx/conf.d/default.conf
+
 # Expose port (Internal container port)
 EXPOSE 80
 
