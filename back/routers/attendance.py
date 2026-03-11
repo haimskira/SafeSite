@@ -71,7 +71,7 @@ def check_out(
     return log
 
 
-@router.get("/my-status", response_model=Optional[schemas.AttendanceLogResponse])
+@router.get("/my-status")
 def get_my_status(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
@@ -80,7 +80,9 @@ def get_my_status(
     log = db.query(models.AttendanceLog).filter(
         models.AttendanceLog.user_id == current_user.id
     ).order_by(models.AttendanceLog.timestamp.desc()).first()
-    return log
+    if not log:
+        return None
+    return schemas.AttendanceLogResponse.model_validate(log)
 
 
 @router.get("/logs", response_model=List[schemas.AttendanceLogResponse])

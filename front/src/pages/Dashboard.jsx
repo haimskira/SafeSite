@@ -15,11 +15,10 @@ const Dashboard = () => {
         const fetchMyStatus = async () => {
             try {
                 const res = await api.get('/attendance/my-status');
-                if (res.data) {
-                    const log = res.data;
+                const log = res.data;
+                if (log && log.status) {
                     const checkedIn = log.action_type !== 'CHECK_OUT' && log.status !== 'CHECKED_OUT';
                     setIsCheckedIn(checkedIn);
-                    // Map raw status to translated display text
                     const statusMap = {
                         'WORKING': t('working'),
                         'AT_HOME': t('at_home'),
@@ -27,10 +26,11 @@ const Dashboard = () => {
                         'IN_PROTECTED_AREA': t('in_protected_area'),
                         'CHECKED_OUT': t('i_left'),
                     };
-                    setStatus(statusMap[log.status] || '');
+                    setStatus(statusMap[log.status] || t('unknown'));
                 }
             } catch (err) {
-                console.error('Failed to fetch status', err);
+                // User might not have any attendance logs yet - that's OK
+                console.log('No previous status found');
             }
         };
         fetchMyStatus();
@@ -138,31 +138,33 @@ const Dashboard = () => {
                     </p>
 
                     <div className="status-grid" style={{ marginBottom: 0 }}>
-                        {/* "In Protected Area" always visible */}
+                        {/* "In Protected Area" button */}
                         <button 
                             className="btn" 
                             style={{ 
                                 background: status === t('in_protected_area') ? 'var(--warning)' : 'transparent',
                                 color: status === t('in_protected_area') ? '#000' : 'var(--warning)',
-                                border: '2px solid var(--warning)'
+                                border: '2px solid var(--warning)',
+                                flex: '1'
                             }} 
                             onClick={() => handleStatusUpdate(t('in_protected_area'), 'IN_PROTECTED_AREA')}
                         >
                             🛡️ {t('in_protected_area')}
                         </button>
 
-                        {/* "Working" only when checked in */}
+                        {/* "Not in Protected Area" button - effectively "Working" */}
                         {isCheckedIn && (
                             <button 
                                 className="btn" 
                                 style={{ 
-                                    background: status === t('working') ? 'var(--success)' : 'transparent',
-                                    color: status === t('working') ? '#fff' : 'var(--success)',
-                                    border: '2px solid var(--success)'
+                                    background: (status === t('working') || status === t('not_in_protected_area')) ? 'var(--danger)' : 'transparent',
+                                    color: (status === t('working') || status === t('not_in_protected_area')) ? '#fff' : 'var(--danger)',
+                                    border: '2px solid var(--danger)',
+                                    flex: '1'
                                 }} 
                                 onClick={() => handleStatusUpdate(t('working'), 'WORKING')}
                             >
-                                💼 {t('working')}
+                                {t('not_in_protected_area')}
                             </button>
                         )}
 

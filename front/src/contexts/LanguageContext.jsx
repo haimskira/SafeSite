@@ -82,7 +82,8 @@ const translations = {
         unknown: "Unknown",
         delete_user: "Delete",
         please_select_times: "Please select both start and end times",
-        live_status: "Live User Status"
+        live_status: "Live User Status",
+        not_in_protected_area: "Outside Protected Area"
     },
     he: {
         dashboard: "מסך הבית",
@@ -163,7 +164,8 @@ const translations = {
         unknown: "לא ידוע",
         delete_user: "מחיקה",
         please_select_times: "נא לבחור שעת התחלה וסיום",
-        live_status: "סטטוס עובדים בזמן אמת"
+        live_status: "סטטוס עובדים בזמן אמת",
+        not_in_protected_area: "לא במרחב מוגן"
     }
 };
 
