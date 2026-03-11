@@ -8,6 +8,7 @@ const AdminDashboard = () => {
     const [logs, setLogs] = useState([]);
     const [requests, setRequests] = useState([]);
     const [users, setUsers] = useState([]);
+    const [latestStatus, setLatestStatus] = useState([]);
     const [filterDate, setFilterDate] = useState('');
     const [filterSite, setFilterSite] = useState('');
 
@@ -38,6 +39,21 @@ const AdminDashboard = () => {
         fetchData();
     }, [filterDate, filterSite]);
 
+    const fetchLatestStatus = async () => {
+        try {
+            const res = await api.get('/attendance/latest-status');
+            setLatestStatus(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        fetchLatestStatus();
+        const interval = setInterval(fetchLatestStatus, 3000);
+        return () => clearInterval(interval);
+    }, []);
+
     useEffect(() => {
         let ws;
         let reconnectTimer;
@@ -55,6 +71,7 @@ const AdminDashboard = () => {
                 if (event.data === "refresh") {
                     console.log("WebSocket refresh signal received. Fetching new data...");
                     fetchData();
+                    fetchLatestStatus();
                 }
             };
 
@@ -174,6 +191,42 @@ const AdminDashboard = () => {
             </div>
 
             <div style={{ display: 'grid', gap: '2rem', marginTop: '2rem' }}>
+
+                {/* Live User Status */}
+                <div className="glass-card" style={{ border: '1px solid var(--primary-color)', boxShadow: '0 4px 24px rgba(56, 189, 248, 0.15)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--success)', display: 'inline-block', animation: 'pulse 1.5s infinite' }}></span>
+                            Live User Status (Latest)
+                        </h3>
+                        <span className="badge badge-admin" style={{ fontSize: '0.7rem' }}>Updates every 3s</span>
+                    </div>
+                    <div className="table-container">
+                        <table className="glass-table">
+                            <thead>
+                                <tr>
+                                    <th>{t('user')}</th>
+                                    <th>{t('department')}</th>
+                                    <th>{t('site')}</th>
+                                    <th>{t('status')}</th>
+                                    <th>{t('time')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {latestStatus.map(log => (
+                                    <tr key={`latest-${log.id}`}>
+                                        <td>{log.user?.first_name} {log.user?.last_name}</td>
+                                        <td>{log.user?.department || 'N/A'}</td>
+                                        <td>{log.site === 'NORTH' ? t('north_site') : log.site === 'SOUTH' ? t('south_site') : log.site || 'N/A'}</td>
+                                        <td>{renderSiteOrStatusBadge(log)}</td>
+                                        <td>{new Date(log.timestamp).toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                                {latestStatus.length === 0 && <tr><td colSpan="5">No data available.</td></tr>}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
 
                 {/* Active Workers */}
                 <div className="glass-card">

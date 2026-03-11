@@ -28,7 +28,7 @@ const Navbar = () => {
             </div>
             <div className="nav-links">
                 {/* Language Toggle */}
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderRight: '1px solid var(--border-color)', paddingRight: '1rem' }}>
+                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', borderInlineEnd: '1px solid var(--border-color)', paddingInlineEnd: '1rem' }}>
                     <button onClick={() => toggleLang('he')} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, opacity: lang === 'he' ? 1 : 0.4, transition: 'opacity 0.2s' }}>
                         <img src="https://flagcdn.com/w40/il.png" alt="Hebrew" style={{ width: '24px', borderRadius: '4px', display: 'block' }} />
                     </button>
@@ -37,7 +37,7 @@ const Navbar = () => {
                     </button>
                 </div>
 
-                <button onClick={toggleTheme} className="btn" style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-main)', padding: '0.2rem 0.6rem', fontSize: '1rem' }}>
+                <button onClick={toggleTheme} style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'grayscale(0.2)' }} title="Toggle Theme">
                     🌓
                 </button>
 
