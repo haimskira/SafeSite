@@ -39,27 +39,48 @@ const AdminDashboard = () => {
     }, [filterDate, filterSite]);
 
     useEffect(() => {
-        // Determine the base API URL (could be from env or default)
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-        
-        // Convert http/https to ws/wss
-        const wsUrl = baseUrl.replace(/^http(s?):\/\//, 'ws$1://') + '/ws';
-        
-        const ws = new WebSocket(wsUrl);
+        let ws;
+        let reconnectTimer;
+        let reconnectDelay = 1000;
+        let isMounted = true;
 
-        ws.onmessage = (event) => {
-            if (event.data === "refresh") {
-                console.log("WebSocket refresh signal received. Fetching new data...");
-                fetchData();
-            }
+        const connect = () => {
+            // Use the same origin (proxied by Vite in dev, Nginx in prod)
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws`;
+            
+            ws = new WebSocket(wsUrl);
+
+            ws.onmessage = (event) => {
+                if (event.data === "refresh") {
+                    console.log("WebSocket refresh signal received. Fetching new data...");
+                    fetchData();
+                }
+            };
+
+            ws.onopen = () => {
+                console.log("WebSocket connected for real-time updates");
+                reconnectDelay = 1000; // Reset delay on successful connection
+            };
+            ws.onerror = (error) => console.error("WebSocket error:", error);
+            ws.onclose = () => {
+                console.log("WebSocket disconnected");
+                if (isMounted) {
+                    reconnectTimer = setTimeout(() => {
+                        console.log(`Reconnecting WebSocket in ${reconnectDelay / 1000}s...`);
+                        connect();
+                        reconnectDelay = Math.min(reconnectDelay * 2, 30000);
+                    }, reconnectDelay);
+                }
+            };
         };
 
-        ws.onopen = () => console.log("WebSocket connected for real-time updates");
-        ws.onerror = (error) => console.error("WebSocket error:", error);
-        ws.onclose = () => console.log("WebSocket disconnected");
+        connect();
 
         return () => {
-            ws.close();
+            isMounted = false;
+            clearTimeout(reconnectTimer);
+            if (ws) ws.close();
         };
     }, []); // Only run once on mount
 

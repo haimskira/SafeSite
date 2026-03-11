@@ -112,9 +112,9 @@ const AdminAnalytics = () => {
                         </div>
                     </div>
 
-                    <div className="chart-container glass-card" style={{ marginTop: '20px', padding: '20px', height: '400px' }}>
+                    <div className="chart-container glass-card" style={{ marginTop: '20px', padding: '20px' }}>
                         <h2 className="section-title">{t('hourly_load')}</h2>
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={300}>
                             <BarChart
                                 data={chartData}
                                 margin={{
