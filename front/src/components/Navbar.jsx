@@ -20,7 +20,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="navbar" dir="ltr">
+        <nav className="navbar" dir={lang === 'he' ? 'rtl' : 'ltr'}>
             <div>
                 <Link to="/" style={{ color: 'var(--text-main)', textDecoration: 'none', fontSize: '1.25rem', fontWeight: 'bold' }}>
                     SafeSite
@@ -44,6 +44,7 @@ const Navbar = () => {
                 {user && (
                     <>
                         <Link to="/" className="nav-link">{t('dashboard')}</Link>
+                        <Link to="/requests" className="nav-link">{t('my_requests') || 'Arrival Requests'}</Link>
                         {user.role === 'ADMIN' && (
                             <>
                                 <Link to="/admin" className="nav-link">{t('admin_panel')}</Link>

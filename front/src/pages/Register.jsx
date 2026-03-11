@@ -41,10 +41,10 @@ const Register = () => {
                         <label className="input-label">{t('username')} *</label>
                         <input className="input-field" type="text" name="username" value={formData.username} onChange={handleChange} required />
                     </div>
-                    <div className="input-group" style={{ position: 'relative' }}>
+                    <div className="input-group password-group">
                         <label className="input-label">{t('password')} *</label>
-                        <input className="input-field" type={showPassword ? "text" : "password"} name="password" value={formData.password} onChange={handleChange} required style={{ paddingRight: '2.5rem' }} />
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '0.75rem', top: '2.25rem', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', fontSize: '1.2rem' }}>
+                        <input className="input-field" type={showPassword ? "text" : "password"} name="password" value={formData.password} onChange={handleChange} required />
+                        <button type="button" className="password-toggle-btn" onClick={() => setShowPassword(!showPassword)}>
                             {showPassword ? '👁️' : '👁️‍🗨️'}
                         </button>
                     </div>

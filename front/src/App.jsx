@@ -10,6 +10,7 @@ import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Profile from './pages/Profile';
 import AdminAnalytics from './pages/AdminAnalytics';
+import Requests from './pages/Requests';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/requests" element={<ProtectedRoute><Requests /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
 
         <Route path="/admin" element={
