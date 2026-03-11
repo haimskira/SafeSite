@@ -12,7 +12,28 @@ const Dashboard = () => {
     const [error, setError] = useState('');
 
     useEffect(() => {
-        // Checking in state logic can be added here
+        const fetchMyStatus = async () => {
+            try {
+                const res = await api.get('/attendance/my-status');
+                if (res.data) {
+                    const log = res.data;
+                    const checkedIn = log.action_type !== 'CHECK_OUT' && log.status !== 'CHECKED_OUT';
+                    setIsCheckedIn(checkedIn);
+                    // Map raw status to translated display text
+                    const statusMap = {
+                        'WORKING': t('working'),
+                        'AT_HOME': t('at_home'),
+                        'ON_MY_WAY': t('on_my_way'),
+                        'IN_PROTECTED_AREA': t('in_protected_area'),
+                        'CHECKED_OUT': t('i_left'),
+                    };
+                    setStatus(statusMap[log.status] || '');
+                }
+            } catch (err) {
+                console.error('Failed to fetch status', err);
+            }
+        };
+        fetchMyStatus();
     }, []);
 
     const handleSetDefaultSite = async (siteOption) => {
