@@ -10,31 +10,40 @@ const Dashboard = () => {
     const [isCheckedIn, setIsCheckedIn] = useState(false);
     const [status, setStatus] = useState('');
     const [error, setError] = useState('');
+    const [isFetchingStatus, setIsFetchingStatus] = useState(true);
 
     useEffect(() => {
-        const fetchMyStatus = async () => {
+        const fetchStatus = async () => {
             try {
                 const res = await api.get('/attendance/my-status');
-                const log = res.data;
-                if (log && log.status) {
-                    const checkedIn = log.action_type !== 'CHECK_OUT' && log.status !== 'CHECKED_OUT';
+                const lastLog = res.data;
+                
+                if (lastLog && lastLog.status) {
+                    // Logic: User is checked in only if their status is an "on-site" status
+                    // These are statuses reachable only after clicking "Arrived"
+                    const onSiteStatuses = ['WORKING', 'IN_PROTECTED_AREA'];
+                    const checkedIn = onSiteStatuses.includes(lastLog.status);
+                    
                     setIsCheckedIn(checkedIn);
+                    
                     const statusMap = {
                         'WORKING': t('working'),
+                        'IN_PROTECTED_AREA': t('in_protected_area'),
                         'AT_HOME': t('at_home'),
                         'ON_MY_WAY': t('on_my_way'),
-                        'IN_PROTECTED_AREA': t('in_protected_area'),
-                        'CHECKED_OUT': t('i_left'),
+                        'CHECKED_OUT': t('i_left')
                     };
-                    setStatus(statusMap[log.status] || t('unknown'));
+                    
+                    setStatus(statusMap[lastLog.status] || t('unknown'));
                 }
             } catch (err) {
-                // User might not have any attendance logs yet - that's OK
-                console.log('No previous status found');
+                console.log('No attendance record found');
+            } finally {
+                setIsFetchingStatus(false);
             }
         };
-        fetchMyStatus();
-    }, []);
+        fetchStatus();
+    }, [t]);
 
     const handleSetDefaultSite = async (siteOption) => {
         try {
@@ -75,6 +84,14 @@ const Dashboard = () => {
             setError('Checkout failed');
         }
     };
+
+    if (isFetchingStatus) {
+        return (
+            <div className="container" style={{ textAlign: 'center', marginTop: '4rem' }}>
+                <h2>{t('loading')}</h2>
+            </div>
+        );
+    }
 
     // View 1: First time user - Needs to pick default site
     if (!user?.default_site) {

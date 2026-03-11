@@ -79,7 +79,7 @@ def get_my_status(
     """Returns the latest attendance log for the current user."""
     log = db.query(models.AttendanceLog).filter(
         models.AttendanceLog.user_id == current_user.id
-    ).order_by(models.AttendanceLog.timestamp.desc()).first()
+    ).order_by(models.AttendanceLog.id.desc()).first()
     if not log:
         return None
     return schemas.AttendanceLogResponse.model_validate(log)
