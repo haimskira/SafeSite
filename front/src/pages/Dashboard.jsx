@@ -89,34 +89,35 @@ const Dashboard = () => {
                     {t('site')}: <strong style={{ color: 'var(--primary-color)' }}>{user.default_site === 'NORTH' ? t('north_site') : t('south_site')}</strong>
                 </p>
 
-                {/* Primary Actions */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
-                    <button 
-                        className={`btn ${isCheckedIn ? 'btn-success' : ''}`} 
-                        style={{ padding: '1.5rem', fontSize: '1.25rem', opacity: isCheckedIn ? 1 : 0.7 }} 
-                        onClick={handleCheckIn}
-                        disabled={isCheckedIn}
-                    >
-                        ✅ {t('i_arrived')}
-                    </button>
-                    
-                    <button 
-                        className="btn btn-danger" 
-                        style={{ padding: '1.5rem', fontSize: '1.25rem', opacity: isCheckedIn ? 1 : 0.5 }} 
-                        onClick={handleCheckOut}
-                        disabled={!isCheckedIn}
-                    >
-                        🚪 {t('i_left')}
-                    </button>
+                {/* Primary Action - Single Toggle */}
+                <div style={{ marginBottom: '2rem' }}>
+                    {!isCheckedIn ? (
+                        <button 
+                            className="btn btn-success" 
+                            style={{ padding: '1.5rem', fontSize: '1.25rem', width: '100%' }} 
+                            onClick={handleCheckIn}
+                        >
+                            ✅ {t('i_arrived')}
+                        </button>
+                    ) : (
+                        <button 
+                            className="btn btn-danger" 
+                            style={{ padding: '1.5rem', fontSize: '1.25rem', width: '100%' }} 
+                            onClick={handleCheckOut}
+                        >
+                            🚪 {t('i_left')}
+                        </button>
+                    )}
                 </div>
 
-                {/* Current Status Form */}
+                {/* Current Status */}
                 <div style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.1)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
                     <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', textAlign: 'center' }}>
                         {t('current_status')}: <strong style={{ color: 'var(--primary-color)' }}>{status || t('unknown')}</strong>
                     </p>
 
                     <div className="status-grid" style={{ marginBottom: 0 }}>
+                        {/* "In Protected Area" always visible */}
                         <button 
                             className="btn" 
                             style={{ 
@@ -126,32 +127,52 @@ const Dashboard = () => {
                             }} 
                             onClick={() => handleStatusUpdate(t('in_protected_area'), 'IN_PROTECTED_AREA')}
                         >
-                            {t('in_protected_area')}
+                            🛡️ {t('in_protected_area')}
                         </button>
-                        
-                        <button 
-                            className="btn" 
-                            style={{ 
-                                background: status === t('at_home') ? 'var(--primary-color)' : 'transparent',
-                                color: status === t('at_home') ? '#fff' : 'var(--primary-color)',
-                                border: '2px solid var(--primary-color)'
-                            }} 
-                            onClick={() => handleStatusUpdate(t('at_home'), 'AT_HOME')}
-                        >
-                            {t('at_home')}
-                        </button>
-                        
-                        <button 
-                            className="btn" 
-                            style={{ 
-                                background: status === t('on_my_way') ? 'var(--success)' : 'transparent',
-                                color: status === t('on_my_way') ? '#fff' : 'var(--success)',
-                                border: '2px solid var(--success)'
-                            }} 
-                            onClick={() => handleStatusUpdate(t('on_my_way'), 'ON_MY_WAY')}
-                        >
-                            {t('on_my_way')}
-                        </button>
+
+                        {/* "Working" only when checked in */}
+                        {isCheckedIn && (
+                            <button 
+                                className="btn" 
+                                style={{ 
+                                    background: status === t('working') ? 'var(--success)' : 'transparent',
+                                    color: status === t('working') ? '#fff' : 'var(--success)',
+                                    border: '2px solid var(--success)'
+                                }} 
+                                onClick={() => handleStatusUpdate(t('working'), 'WORKING')}
+                            >
+                                💼 {t('working')}
+                            </button>
+                        )}
+
+                        {/* "At Home" and "On My Way" only when NOT checked in */}
+                        {!isCheckedIn && (
+                            <>
+                                <button 
+                                    className="btn" 
+                                    style={{ 
+                                        background: status === t('at_home') ? 'var(--primary-color)' : 'transparent',
+                                        color: status === t('at_home') ? '#fff' : 'var(--primary-color)',
+                                        border: '2px solid var(--primary-color)'
+                                    }} 
+                                    onClick={() => handleStatusUpdate(t('at_home'), 'AT_HOME')}
+                                >
+                                    🏠 {t('at_home')}
+                                </button>
+                                
+                                <button 
+                                    className="btn" 
+                                    style={{ 
+                                        background: status === t('on_my_way') ? 'var(--success)' : 'transparent',
+                                        color: status === t('on_my_way') ? '#fff' : 'var(--success)',
+                                        border: '2px solid var(--success)'
+                                    }} 
+                                    onClick={() => handleStatusUpdate(t('on_my_way'), 'ON_MY_WAY')}
+                                >
+                                    🚗 {t('on_my_way')}
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
 
