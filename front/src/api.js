@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// Using relative path handles both Docker (via nginx proxy) and local dev (via Vite proxy)
+const apiURL = import.meta.env.VITE_API_URL || '/api';
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
+    baseURL: apiURL,
 });
 
 // Request interceptor to add the JWT token to headers

@@ -63,6 +63,7 @@ const AdminDashboard = () => {
         const connect = () => {
             // Use the same origin (proxied by Vite in dev, Nginx in prod)
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            // Important: we proxy `/ws` via nginx/vite to `ws://backend:8080/ws`
             const wsUrl = `${protocol}//${window.location.host}/ws`;
             
             ws = new WebSocket(wsUrl);
