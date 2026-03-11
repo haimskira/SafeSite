@@ -105,6 +105,23 @@ def get_active_workers(
     
     return query.all()
 
+@router.get("/latest-status", response_model=List[schemas.AttendanceLogResponse])
+def get_latest_status(
+    db: Session = Depends(get_db),
+    current_admin: models.User = Depends(get_current_admin_user)
+):
+    subquery = db.query(
+        models.AttendanceLog.user_id,
+        func.max(models.AttendanceLog.timestamp).label("max_ts")
+    ).group_by(models.AttendanceLog.user_id).subquery()
+    
+    query = db.query(models.AttendanceLog).join(
+        subquery,
+        (models.AttendanceLog.user_id == subquery.c.user_id) & (models.AttendanceLog.timestamp == subquery.c.max_ts)
+    )
+    
+    return query.all()
+
 @router.get("/analytics")
 def get_analytics(
     filter_date: Optional[date] = None,
