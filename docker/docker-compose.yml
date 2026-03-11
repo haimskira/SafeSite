@@ -16,7 +16,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - sqlite_data:/app
+      - sqlite_data:/app/data
     restart: always
     environment:
       - PYTHONUNBUFFERED=1

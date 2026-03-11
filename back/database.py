@@ -1,7 +1,13 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./attendance.db"
+import os
+
+# Create data directory if it doesn't exist
+if not os.path.exists("./data"):
+    os.makedirs("./data")
+
+SQLALCHEMY_DATABASE_URL = "sqlite:///./data/attendance.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
