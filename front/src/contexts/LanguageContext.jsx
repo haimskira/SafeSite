@@ -78,7 +78,11 @@ const translations = {
         detailed_flow: "Detailed Flow Table",
         time_slot: "Time Slot",
         visitors: "Visitors",
-        loading: "Loading..."
+        loading: "Loading...",
+        unknown: "Unknown",
+        delete_user: "Delete",
+        please_select_times: "Please select both start and end times",
+        live_status: "Live User Status"
     },
     he: {
         dashboard: "מסך הבית",
@@ -155,7 +159,11 @@ const translations = {
         detailed_flow: "טבלת זרימה מפורטת",
         time_slot: "שעה",
         visitors: "מבקרים",
-        loading: "טוען..."
+        loading: "טוען...",
+        unknown: "לא ידוע",
+        delete_user: "מחיקה",
+        please_select_times: "נא לבחור שעת התחלה וסיום",
+        live_status: "סטטוס עובדים בזמן אמת"
     }
 };
 

@@ -20,14 +20,12 @@ services:
     restart: always
     environment:
       - PYTHONUNBUFFERED=1
+      - JWT_SECRET_KEY=SafeSite_Pr0duction_S3cret_2026!
 
   frontend:
     build:
       context: ../front
       dockerfile: ../docker/frontend.Dockerfile
-      args:
-        # VITE_API_URL can be injected here during build if required for production
-        - VITE_API_URL=http://localhost:8080
     container_name: safesite_frontend
     networks:
       - safesite_net

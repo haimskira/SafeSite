@@ -132,6 +132,19 @@ const AdminDashboard = () => {
         }
     };
 
+    const handleDeleteUser = async (userId, username) => {
+        if (window.confirm(`Are you sure you want to delete user "${username}"? This action cannot be undone.`)) {
+            try {
+                await api.delete(`/users/${userId}`);
+                fetchData();
+                fetchLatestStatus();
+            } catch (err) {
+                console.error("Failed to delete user");
+                alert(err.response?.data?.detail || "Failed to delete user");
+            }
+        }
+    };
+
     const onSiteCount = activeWorkers.length;
     // Approximation based on total known users vs active workers
     const offSiteCount = Math.max(0, users.length - onSiteCount);
@@ -286,6 +299,7 @@ const AdminDashboard = () => {
                                                     <button className="btn" style={{ padding: '0.25rem 0.5rem', background: 'var(--warning)', color: '#000', width: 'auto' }} onClick={() => handleRoleChange(u.id, 'USER')}>{t('make_user')}</button>
                                                 )}
                                                 <button className="btn btn-danger" style={{ padding: '0.25rem 0.5rem', width: 'auto' }} onClick={() => handlePasswordReset(u.id)}>{t('reset_password')}</button>
+                                                <button className="btn" style={{ padding: '0.25rem 0.5rem', background: 'var(--danger)', width: 'auto' }} onClick={() => handleDeleteUser(u.id, u.username)}>{t('delete_user')}</button>
                                             </div>
                                         </td>
                                     </tr>

@@ -1,15 +1,16 @@
+import os
 from datetime import datetime, timedelta
 from typing import Optional
 import bcrypt
 import jwt
 
-SECRET_KEY = "SUPER_SECRET_KEY_REPLACE_IN_PRODUCTION"
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "SUPER_SECRET_KEY_REPLACE_IN_PRODUCTION")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 1 day
 
 def verify_password(plain_password, hashed_password):
-    # bcrypt expects bytes
-    password_byte_enc = plain_password.encode('utf-8')
+    # bcrypt expects bytes, limit to 72 bytes to match hashing
+    password_byte_enc = plain_password.encode('utf-8')[:72]
     hashed_password_bytes = hashed_password.encode('utf-8')
     return bcrypt.checkpw(password_byte_enc, hashed_password_bytes)
 

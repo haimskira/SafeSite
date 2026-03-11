@@ -112,3 +112,24 @@ def reset_user_password(
     db.refresh(user)
     background_tasks.add_task(trigger_refresh)
     return user
+
+@router.delete("/{user_id}")
+def delete_user(
+    user_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_admin: models.User = Depends(get_current_admin_user)
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.id == current_admin.id:
+        raise HTTPException(status_code=400, detail="Cannot delete yourself")
+    
+    # Delete related attendance logs and requests first
+    db.query(models.AttendanceLog).filter(models.AttendanceLog.user_id == user_id).delete()
+    db.query(models.ArrivalRequest).filter(models.ArrivalRequest.user_id == user_id).delete()
+    db.delete(user)
+    db.commit()
+    background_tasks.add_task(trigger_refresh)
+    return {"detail": "User deleted successfully"}
