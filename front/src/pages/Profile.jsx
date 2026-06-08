@@ -66,7 +66,7 @@ const Profile = () => {
     };
 
     return (
-        <div className="container" style={{ display: 'flex', justifyContent: 'center', marginTop: '4rem' }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'center', marginTop: 'clamp(1rem, 5vw, 4rem)' }}>
             <div className="glass-card" style={{ maxWidth: '450px', width: '100%' }}>
                 <h2>{t('update_profile')}</h2>
                 {msg.text && (

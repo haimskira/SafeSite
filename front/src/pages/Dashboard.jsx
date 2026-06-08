@@ -3,89 +3,74 @@ import api from '../api';
 import { AuthContext } from '../contexts/AuthContext';
 import { LanguageContext } from '../contexts/LanguageContext';
 
-const Dashboard = () => {
-    const { user, initAuth } = useContext(AuthContext);
-    const { t } = useContext(LanguageContext);
+const LOCATIONS = [
+    {
+        key: 'NORTH',
+        status: 'IN_PROTECTED_AREA',
+        labelKey: 'in_protected_area',
+        icon: '🏢',
+        color: 'var(--warning)',
+        bgColor: 'rgba(245, 158, 11, 0.12)',
+    },
+    {
+        key: 'SOUTH',
+        status: 'ON_MY_WAY',
+        labelKey: 'on_my_way',
+        icon: '🏭',
+        color: 'var(--success)',
+        bgColor: 'rgba(16, 185, 129, 0.12)',
+    },
+    {
+        key: 'HOME',
+        status: 'AT_HOME',
+        labelKey: 'at_home',
+        icon: '🏠',
+        color: 'var(--primary-color)',
+        bgColor: 'rgba(56, 189, 248, 0.12)',
+    },
+];
 
-    const [isCheckedIn, setIsCheckedIn] = useState(false);
-    const [status, setStatus] = useState('');
+const Dashboard = () => {
+    const { user } = useContext(AuthContext);
+    const { t } = useContext(LanguageContext);
+    const [currentStatus, setCurrentStatus] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [updating, setUpdating] = useState(false);
     const [error, setError] = useState('');
-    const [isFetchingStatus, setIsFetchingStatus] = useState(true);
 
     useEffect(() => {
         const fetchStatus = async () => {
             try {
                 const res = await api.get('/attendance/my-status');
-                const lastLog = res.data;
-                
-                if (lastLog && lastLog.status) {
-                    // Logic: User is checked in only if their status is an "on-site" status
-                    // These are statuses reachable only after clicking "Arrived"
-                    const onSiteStatuses = ['WORKING', 'IN_PROTECTED_AREA', 'ON_MY_WAY'];
-                    const checkedIn = onSiteStatuses.includes(lastLog.status);
-                    
-                    setIsCheckedIn(checkedIn);
-                    
-                    const statusMap = {
-                        'WORKING': t('working'),
-                        'IN_PROTECTED_AREA': t('in_protected_area'),
-                        'AT_HOME': t('at_home'),
-                        'ON_MY_WAY': t('on_my_way'),
-                        'CHECKED_OUT': t('i_left')
-                    };
-                    
-                    setStatus(statusMap[lastLog.status] || t('unknown'));
-                }
-            } catch (err) {
-                console.log('No attendance record found');
+                if (res.data?.status) setCurrentStatus(res.data.status);
+            } catch {
+                // no record yet
             } finally {
-                setIsFetchingStatus(false);
+                setLoading(false);
             }
         };
         fetchStatus();
-    }, [t]);
+    }, []);
 
-    const handleSetDefaultSite = async (siteOption) => {
+    const handleSelect = async (loc) => {
+        if (updating) return;
+        setUpdating(true);
+        setError('');
         try {
-            await api.put('/users/me/site', null, { params: { site: siteOption } });
-            await initAuth(); // Refresh user object in context so default_site is populated
-        } catch (err) {
-            setError('Failed to save default site');
+            if (loc.key === 'HOME') {
+                await api.post('/attendance/update-status', { status: 'AT_HOME' });
+            } else {
+                await api.post('/attendance/check-in', { site: loc.key, status: loc.status });
+            }
+            setCurrentStatus(loc.status);
+        } catch {
+            setError('Failed to update status');
+        } finally {
+            setUpdating(false);
         }
     };
 
-    const handleCheckIn = async () => {
-        if (!user.default_site) return setError('No site selected');
-        try {
-            await api.post('/attendance/check-in', { site: user.default_site, status: 'WORKING' });
-            setIsCheckedIn(true);
-            setStatus(t('working'));
-            setError('');
-        } catch (err) {
-            setError('Check-in failed');
-        }
-    };
-
-    const handleStatusUpdate = async (newStatusText, rawStatus) => {
-        try {
-            await api.post('/attendance/update-status', { status: rawStatus });
-            setStatus(newStatusText);
-        } catch (err) {
-            setError('Status update failed');
-        }
-    };
-
-    const handleCheckOut = async () => {
-        try {
-            await api.post('/attendance/check-out');
-            setIsCheckedIn(false);
-            setStatus(t('i_left'));
-        } catch (err) {
-            setError('Checkout failed');
-        }
-    };
-
-    if (isFetchingStatus) {
+    if (loading) {
         return (
             <div className="container" style={{ textAlign: 'center', marginTop: '4rem' }}>
                 <h2>{t('loading')}</h2>
@@ -93,142 +78,57 @@ const Dashboard = () => {
         );
     }
 
-    // View 1: First time user - Needs to pick default site
-    if (!user?.default_site) {
-        return (
-            <div className="container" style={{ textAlign: 'center', marginTop: '4rem' }}>
-                <h2>{t('welcome_back')}, {user?.first_name}</h2>
-                <h3 style={{ marginTop: '1rem', color: 'var(--text-muted)' }}>{t('choose_default_site')}</h3>
-                <p>{t('remember_site')}</p>
+    const active = LOCATIONS.find(l => l.status === currentStatus);
 
-                {error && <div className="error-msg" style={{ maxWidth: '400px', margin: '1rem auto' }}>{error}</div>}
-
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginTop: '3rem', flexWrap: 'wrap' }}>
-                    <button onClick={() => handleSetDefaultSite('NORTH')} className="glass-card" style={{ cursor: 'pointer', flex: '1', minWidth: '250px', maxWidth: '300px', border: '2px solid var(--primary-color)' }}>
-                        <h2>🏢 {t('north_site')}</h2>
-                    </button>
-                    <button onClick={() => handleSetDefaultSite('SOUTH')} className="glass-card" style={{ cursor: 'pointer', flex: '1', minWidth: '250px', maxWidth: '300px', border: '2px solid var(--warning)' }}>
-                        <h2>🏭 {t('south_site')}</h2>
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    // View 2: Regular User Dashboard - Check In / Out
     return (
-        <div className="container" style={{ maxWidth: '800px' }}>
-            <h2>{t('welcome_back')}, {user?.first_name}</h2>
+        <div className="container dashboard-home">
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                <h2 style={{ marginBottom: '0.4rem' }}>{t('welcome_back')}, {user?.first_name}</h2>
+                {active && (
+                    <p style={{ color: active.color, fontWeight: 600, fontSize: '1rem' }}>
+                        {active.icon} {active.label || t(active.labelKey)}
+                    </p>
+                )}
+            </div>
+
             {error && <div className="error-msg">{error}</div>}
 
-            <div className="glass-card" style={{ marginTop: '2rem' }}>
-                <h3 style={{ marginBottom: '0.5rem' }}>{t('dashboard')}</h3>
-                <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-                    {t('site')}: <strong style={{ color: 'var(--primary-color)' }}>{user.default_site === 'NORTH' ? t('north_site') : t('south_site')}</strong>
-                </p>
-
-                {/* Primary Action - Single Toggle */}
-                <div style={{ marginBottom: '2rem' }}>
-                    {!isCheckedIn ? (
-                        <button 
-                            className="btn btn-success" 
-                            style={{ padding: '1.5rem', fontSize: '1.25rem', width: '100%' }} 
-                            onClick={handleCheckIn}
-                        >
-                            ✅ {t('i_arrived')}
-                        </button>
-                    ) : (
-                        <button 
-                            className="btn btn-danger" 
-                            style={{ padding: '1.5rem', fontSize: '1.25rem', width: '100%' }} 
-                            onClick={handleCheckOut}
-                        >
-                            🚪 {t('i_left')}
-                        </button>
-                    )}
-                </div>
-
-                {/* Current Status */}
-                <div style={{ padding: '1.5rem', background: 'rgba(0,0,0,0.1)', borderRadius: '12px', border: '1px solid var(--border-color)' }}>
-                    <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', textAlign: 'center' }}>
-                        {t('current_status')}: <strong style={{ color: 'var(--primary-color)' }}>{status || t('unknown')}</strong>
-                    </p>
-
-                    <div className="status-grid" style={{ marginBottom: 0 }}>
+            <div className="location-grid">
+                {LOCATIONS.map(loc => {
+                    const selected = currentStatus === loc.status;
+                    return (
                         <button
-                            className="btn"
+                            key={loc.key}
+                            onClick={() => handleSelect(loc)}
+                            disabled={updating}
+                            className="location-card"
                             style={{
-                                background: status === t('in_protected_area') ? 'var(--warning)' : 'transparent',
-                                color: status === t('in_protected_area') ? '#000' : 'var(--warning)',
-                                border: '2px solid var(--warning)',
-                                flex: '1'
+                                background: selected ? loc.bgColor : 'var(--card-bg)',
+                                border: selected
+                                    ? `2px solid ${loc.color}`
+                                    : '1px solid var(--border-color)',
+                                boxShadow: selected
+                                    ? `0 0 24px ${loc.bgColor}`
+                                    : 'var(--shadow-md)',
+                                opacity: updating && !selected ? 0.55 : 1,
                             }}
-                            onClick={() => handleStatusUpdate(t('in_protected_area'), 'IN_PROTECTED_AREA')}
                         >
-                            🏢 {t('in_protected_area')}
+                            <span className="location-icon">{loc.icon}</span>
+                            <span
+                                className="location-label"
+                                style={{ color: selected ? loc.color : 'var(--text-main)' }}
+                            >
+                                {t(loc.labelKey)}
+                            </span>
+                            {selected && (
+                                <span
+                                    className="location-dot"
+                                    style={{ background: loc.color }}
+                                />
+                            )}
                         </button>
-
-                        <button
-                            className="btn"
-                            style={{
-                                background: status === t('on_my_way') ? 'var(--success)' : 'transparent',
-                                color: status === t('on_my_way') ? '#fff' : 'var(--success)',
-                                border: '2px solid var(--success)',
-                                flex: '1'
-                            }}
-                            onClick={() => handleStatusUpdate(t('on_my_way'), 'ON_MY_WAY')}
-                        >
-                            🏭 {t('on_my_way')}
-                        </button>
-
-                        <button
-                            className="btn"
-                            style={{
-                                background: status === t('at_home') ? 'var(--primary-color)' : 'transparent',
-                                color: status === t('at_home') ? '#fff' : 'var(--primary-color)',
-                                border: '2px solid var(--primary-color)',
-                                flex: '1'
-                            }}
-                            onClick={() => handleStatusUpdate(t('at_home'), 'AT_HOME')}
-                        >
-                            🏠 {t('at_home')}
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-
-            {/* Site change */}
-            <div className="glass-card" style={{ marginTop: '1.5rem' }}>
-                <p style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-                    {t('change_site')}
-                </p>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <button
-                        className="btn"
-                        style={{
-                            flex: '1',
-                            background: user.default_site === 'NORTH' ? 'var(--primary-color)' : 'transparent',
-                            color: user.default_site === 'NORTH' ? '#fff' : 'var(--primary-color)',
-                            border: '2px solid var(--primary-color)'
-                        }}
-                        onClick={() => handleSetDefaultSite('NORTH')}
-                    >
-                        🏢 {t('north_site')}
-                    </button>
-                    <button
-                        className="btn"
-                        style={{
-                            flex: '1',
-                            background: user.default_site === 'SOUTH' ? 'var(--warning)' : 'transparent',
-                            color: user.default_site === 'SOUTH' ? '#000' : 'var(--warning)',
-                            border: '2px solid var(--warning)'
-                        }}
-                        onClick={() => handleSetDefaultSite('SOUTH')}
-                    >
-                        🏭 {t('south_site')}
-                    </button>
-                </div>
+                    );
+                })}
             </div>
         </div>
     );

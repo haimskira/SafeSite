@@ -567,6 +567,90 @@ select.input-field option {
   margin-bottom: 2rem;
 }
 
+/* === Dashboard Home — Location picker === */
+.dashboard-home {
+  max-width: 680px;
+}
+
+.location-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.location-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem 1rem;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  font-family: inherit;
+  position: relative;
+}
+
+.location-card:hover:not(:disabled) {
+  transform: translateY(-4px);
+}
+
+.location-card:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.location-card:disabled {
+  cursor: wait;
+}
+
+.location-icon {
+  font-size: 2.75rem;
+  line-height: 1;
+}
+
+.location-label {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.location-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: block;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@media (max-width: 520px) {
+  .location-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .location-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 1.25rem 1.5rem;
+    gap: 1rem;
+  }
+
+  .location-icon {
+    font-size: 2rem;
+  }
+
+  .location-label {
+    font-size: 1.05rem;
+  }
+
+  .location-dot {
+    margin-inline-start: auto;
+  }
+}
+
 /* === Custom Time Picker === */
 .time-item {
   padding: 0.5rem;
@@ -725,6 +809,30 @@ select.input-field option {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* === Navbar brand + hamburger === */
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-hamburger {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.65rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.2s;
+}
+
+.nav-hamburger:hover {
+  background: var(--primary-glow);
+}
+
 /* === Scrollbar === */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
@@ -742,27 +850,55 @@ select.input-field option {
 
 /* === Responsive === */
 @media (max-width: 768px) {
+  /* Navbar */
   .navbar {
     flex-direction: column;
-    gap: 0.75rem;
+    align-items: stretch;
     padding: 0.75rem 1rem;
+    gap: 0;
+  }
+
+  .navbar-brand {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .nav-hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .nav-links {
-    flex-wrap: wrap;
-    justify-content: center;
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 0.75rem;
     gap: 0.5rem;
+    border-top: 1px solid var(--border-color);
+    margin-top: 0.75rem;
+  }
+
+  .nav-links.nav-open {
+    display: flex;
   }
 
   .nav-link {
-    font-size: 0.85rem;
-    padding: 0.3rem 0.5rem;
+    font-size: 0.95rem;
+    padding: 0.6rem 0.5rem;
+    width: 100%;
+  }
+
+  .nav-links .btn {
+    width: 100%;
+    margin-top: 0.25rem;
   }
 
   .user-greeting {
     display: none !important;
   }
 
+  /* Layout */
   .container {
     padding: 1rem;
   }
@@ -771,21 +907,108 @@ select.input-field option {
     padding: 1rem;
   }
 
-  .stats-grid {
+  /* Cards */
+  .glass-card {
+    padding: 1.25rem;
+  }
+
+  .glass-card:hover {
+    transform: none;
+  }
+
+  /* Typography */
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  /* Status grid — single column on small screens */
+  .status-grid {
     grid-template-columns: 1fr;
   }
 
-  .filters-container {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filters-container .input-group {
-    max-width: 100%;
+  /* Stats grid */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
   }
 
   .stat-value {
     font-size: 2.5rem;
+  }
+
+  /* Filters */
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .filters-container .input-group {
+    max-width: 100%;
+    min-width: unset;
+  }
+
+  /* Tables */
+  .glass-table th,
+  .glass-table td {
+    padding: 0.65rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  /* Admin action buttons — stack vertically */
+  .admin-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-actions .btn {
+    width: 100%;
+    padding: 0.35rem 0.5rem !important;
+    font-size: 0.8rem;
+  }
+
+  /* Requests — stack time pickers */
+  .time-pickers-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Profile top margin */
+  .container > [class="glass-card"] {
+    margin-top: 1rem !important;
+  }
+
+  /* Dashboard check-in button */
+  .btn {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .glass-card {
+    padding: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .glass-table th,
+  .glass-table td {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  h3 {
+    font-size: 1rem;
   }
 }
 

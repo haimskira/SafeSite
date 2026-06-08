@@ -55,7 +55,7 @@ const Requests = () => {
                         <label className="input-label">{t('date')}</label>
                         <input type="date" className="input-field" value={reqDate} onChange={e => setReqDate(e.target.value)} required />
                     </div>
-                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <div className="time-pickers-row" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                         <CustomTimePicker
                             label={t('start_time')}
                             value={reqStart}

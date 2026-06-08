@@ -292,7 +292,7 @@ const AdminDashboard = () => {
                                         <td>{u.department || 'N/A'}</td>
                                         <td><span className={`badge ${u.role === 'ADMIN' ? 'badge-admin' : 'badge-user'}`}>{u.role}</span></td>
                                         <td>
-                                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <div className="admin-actions" style={{ display: 'flex', gap: '0.5rem' }}>
                                                 {u.role === 'USER' ? (
                                                     <button className="btn btn-success" style={{ padding: '0.25rem 0.5rem', width: 'auto' }} onClick={() => handleRoleChange(u.id, 'ADMIN')}>{t('make_admin')}</button>
                                                 ) : (
