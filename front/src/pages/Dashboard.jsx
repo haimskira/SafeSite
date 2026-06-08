@@ -21,7 +21,7 @@ const Dashboard = () => {
                 if (lastLog && lastLog.status) {
                     // Logic: User is checked in only if their status is an "on-site" status
                     // These are statuses reachable only after clicking "Arrived"
-                    const onSiteStatuses = ['WORKING', 'IN_PROTECTED_AREA'];
+                    const onSiteStatuses = ['WORKING', 'IN_PROTECTED_AREA', 'ON_MY_WAY'];
                     const checkedIn = onSiteStatuses.includes(lastLog.status);
                     
                     setIsCheckedIn(checkedIn);
@@ -155,67 +155,80 @@ const Dashboard = () => {
                     </p>
 
                     <div className="status-grid" style={{ marginBottom: 0 }}>
-                        {/* "In Protected Area" button */}
-                        <button 
-                            className="btn" 
-                            style={{ 
+                        <button
+                            className="btn"
+                            style={{
                                 background: status === t('in_protected_area') ? 'var(--warning)' : 'transparent',
                                 color: status === t('in_protected_area') ? '#000' : 'var(--warning)',
                                 border: '2px solid var(--warning)',
                                 flex: '1'
-                            }} 
+                            }}
                             onClick={() => handleStatusUpdate(t('in_protected_area'), 'IN_PROTECTED_AREA')}
                         >
-                            🛡️ {t('in_protected_area')}
+                            🏢 {t('in_protected_area')}
                         </button>
 
-                        {/* "Not in Protected Area" button - effectively "Working" */}
-                        {isCheckedIn && (
-                            <button 
-                                className="btn" 
-                                style={{ 
-                                    background: (status === t('working') || status === t('not_in_protected_area')) ? 'var(--danger)' : 'transparent',
-                                    color: (status === t('working') || status === t('not_in_protected_area')) ? '#fff' : 'var(--danger)',
-                                    border: '2px solid var(--danger)',
-                                    flex: '1'
-                                }} 
-                                onClick={() => handleStatusUpdate(t('working'), 'WORKING')}
-                            >
-                                {t('not_in_protected_area')}
-                            </button>
-                        )}
+                        <button
+                            className="btn"
+                            style={{
+                                background: status === t('on_my_way') ? 'var(--success)' : 'transparent',
+                                color: status === t('on_my_way') ? '#fff' : 'var(--success)',
+                                border: '2px solid var(--success)',
+                                flex: '1'
+                            }}
+                            onClick={() => handleStatusUpdate(t('on_my_way'), 'ON_MY_WAY')}
+                        >
+                            🏭 {t('on_my_way')}
+                        </button>
 
-                        {/* "At Home" and "On My Way" only when NOT checked in */}
-                        {!isCheckedIn && (
-                            <>
-                                <button 
-                                    className="btn" 
-                                    style={{ 
-                                        background: status === t('at_home') ? 'var(--primary-color)' : 'transparent',
-                                        color: status === t('at_home') ? '#fff' : 'var(--primary-color)',
-                                        border: '2px solid var(--primary-color)'
-                                    }} 
-                                    onClick={() => handleStatusUpdate(t('at_home'), 'AT_HOME')}
-                                >
-                                    🏠 {t('at_home')}
-                                </button>
-                                
-                                <button 
-                                    className="btn" 
-                                    style={{ 
-                                        background: status === t('on_my_way') ? 'var(--success)' : 'transparent',
-                                        color: status === t('on_my_way') ? '#fff' : 'var(--success)',
-                                        border: '2px solid var(--success)'
-                                    }} 
-                                    onClick={() => handleStatusUpdate(t('on_my_way'), 'ON_MY_WAY')}
-                                >
-                                    🚗 {t('on_my_way')}
-                                </button>
-                            </>
-                        )}
+                        <button
+                            className="btn"
+                            style={{
+                                background: status === t('at_home') ? 'var(--primary-color)' : 'transparent',
+                                color: status === t('at_home') ? '#fff' : 'var(--primary-color)',
+                                border: '2px solid var(--primary-color)',
+                                flex: '1'
+                            }}
+                            onClick={() => handleStatusUpdate(t('at_home'), 'AT_HOME')}
+                        >
+                            🏠 {t('at_home')}
+                        </button>
                     </div>
                 </div>
 
+            </div>
+
+            {/* Site change */}
+            <div className="glass-card" style={{ marginTop: '1.5rem' }}>
+                <p style={{ marginBottom: '1rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
+                    {t('change_site')}
+                </p>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button
+                        className="btn"
+                        style={{
+                            flex: '1',
+                            background: user.default_site === 'NORTH' ? 'var(--primary-color)' : 'transparent',
+                            color: user.default_site === 'NORTH' ? '#fff' : 'var(--primary-color)',
+                            border: '2px solid var(--primary-color)'
+                        }}
+                        onClick={() => handleSetDefaultSite('NORTH')}
+                    >
+                        🏢 {t('north_site')}
+                    </button>
+                    <button
+                        className="btn"
+                        style={{
+                            flex: '1',
+                            background: user.default_site === 'SOUTH' ? 'var(--warning)' : 'transparent',
+                            color: user.default_site === 'SOUTH' ? '#000' : 'var(--warning)',
+                            border: '2px solid var(--warning)'
+                        }}
+                        onClick={() => handleSetDefaultSite('SOUTH')}
+                    >
+                        🏭 {t('south_site')}
+                    </button>
+                </div>
             </div>
         </div>
     );
