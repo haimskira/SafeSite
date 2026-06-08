@@ -14,7 +14,7 @@ services:
     networks:
       - safesite_net
     ports:
-      - "8080:8080"
+      - "47293:8080"
     volumes:
       - sqlite_data:/app/data
     restart: always
@@ -30,7 +30,7 @@ services:
     networks:
       - safesite_net
     ports:
-      - "3000:80"
+      - "31857:80"
     depends_on:
       - backend
     restart: always
